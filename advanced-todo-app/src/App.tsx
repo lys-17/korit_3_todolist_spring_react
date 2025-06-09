@@ -1,5 +1,5 @@
 import './App.css'
-import { useState, useEffect, use } from 'react';
+import { useState, useEffect } from 'react';
 import type { Todo } from './types/Todo';
 import TodoForm from "./components/TodoForm"
 import {TodoList} from "./components/TodoList"
@@ -7,7 +7,7 @@ import { addTodoApi, deleteTodoApi, getAllTodos, toggleTodoApi } from './service
 // import { v4 as uuid } from 'uuid';
 
 function App() {
-  const [ todos, setTodos ] = useState<Todo[]>([])
+  const [ todos, setTodos ] = useState<Todo[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
@@ -30,6 +30,7 @@ function App() {
       setIsLoading(true);
       const newTodo = await addTodoApi(text);
       setTodos(prevTodos => [...prevTodos, newTodo]);
+      setIsLoading(false);
     } catch (error) {
       console.log('todo를 추가하는 데 실패했습니다 : ', error);
     }
@@ -38,7 +39,7 @@ function App() {
   const handleToggleComplete = async (id:number): Promise<void> => {
     try {
       const todoToToggle = todos.find(todo => todo.id === id);
-      if (todoToToggle) return;
+      if (!todoToToggle) return;
       const upatedTodo = await toggleTodoApi(id, todoToToggle.completed);
       setTodos(prevTodos =>
         prevTodos.map(todo => (todo.id === id ? upatedTodo : todo))
@@ -48,14 +49,10 @@ function App() {
     }
   };
 
-
-
-
-
   const handleDeleteTodo = async (id: number) : Promise<void> => {
     try {
       await deleteTodoApi(id);
-      setTodos(prevTodos => [...prevTodos, newTodo]);
+      setTodos(prevTodos => prevTodos.filter(todo => todo.id !== id));
     } catch (error) {
       console.log('todo를 지우는 데 실패했습니다 :', error);
     }
@@ -70,10 +67,11 @@ function App() {
         isLoading ? (
           <p>목록을 불러오는 중입니다...</p>
         ) : (
-
+          <TodoList todos={todos} 
+          onToggleComplete={handleToggleComplete} 
+          onDeleteTodo={handleDeleteTodo}/>
         )
       }
-      <TodoList todos={todos} onToggleComplete={toggleComplete} onDeleteTodo={deleteTodo}/>
     </div>
   )
 }
