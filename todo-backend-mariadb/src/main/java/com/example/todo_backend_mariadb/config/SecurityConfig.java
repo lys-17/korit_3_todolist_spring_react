@@ -26,10 +26,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authz ->
                         // preflight 요청(OPTION 매서드)은 인증 없이 모두 허용
                         authz.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                                // 현재 로그인 기능이 바로 없으므로, 모든 API 요청을 임시로 허용
-                                .requestMatchers("/api/**").permitAll()
-                                // 혹시 몰라서 나머지 모든 요청도 일단 허용
-                                .anyRequest().permitAll()
+                                // 이제 /api 관련 경로는 인증된 사용자만 접근 가능하도록 변경
+                                .requestMatchers("/api/**").authenticated()
+                                .anyRequest().authenticated()
                 );
         return http.build();
     }
