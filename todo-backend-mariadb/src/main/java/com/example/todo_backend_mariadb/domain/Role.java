@@ -3,8 +3,6 @@ package com.example.todo_backend_mariadb.domain;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import java.util.Optional;
-
 @Getter
 @RequiredArgsConstructor
 public enum Role {

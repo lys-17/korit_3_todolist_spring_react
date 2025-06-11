@@ -3,6 +3,7 @@ package com.example.todo_backend_mariadb.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -17,6 +18,23 @@ import java.util.Arrays;
 @EnableWebSecurity
 public class SecurityConfig {
 
+//     Oauth2 적용 전
+//    @Bean
+//    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+//        http.cors(cors -> cors.configurationSource(corsConfigurationSource()))
+//                .csrf(csrf -> csrf.disable())
+//                .sessionManagement(session ->
+//                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+//                .authorizeHttpRequests(authz ->
+//                        // preflight 요청(OPTION 매서드)은 인증 없이 모두 허용
+//                        authz.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+//                                // 이제 /api 관련 경로는 인증된 사용자만 접근 가능하도록 변경
+//                                .requestMatchers("/api/**").authenticated()
+//                                .anyRequest().authenticated()
+//                );
+//        return http.build();
+//    }
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.cors(cors -> cors.configurationSource(corsConfigurationSource()))
@@ -29,13 +47,15 @@ public class SecurityConfig {
                                 // 이제 /api 관련 경로는 인증된 사용자만 접근 가능하도록 변경
                                 .requestMatchers("/api/**").authenticated()
                                 .anyRequest().authenticated()
-                );
+                )
+                .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()));
         return http.build();
     }
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173"));
+        configuration.setAllowedOrigins(Arrays.asList("https://localhost:5173"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type"));
         configuration.setAllowCredentials(true);
